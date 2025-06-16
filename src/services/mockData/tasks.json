@@ -1,0 +1,90 @@
+[
+  {
+    "id": "1",
+    "title": "Complete project proposal",
+    "description": "Draft and finalize the quarterly project proposal for the marketing team",
+    "categoryId": "work",
+    "priority": "high",
+    "dueDate": "2024-01-20",
+    "completed": false,
+    "createdAt": "2024-01-15T09:00:00Z",
+    "updatedAt": "2024-01-15T09:00:00Z"
+  },
+  {
+    "id": "2",
+    "title": "Review design mockups",
+    "description": "Review and provide feedback on the new website design mockups",
+    "categoryId": "work",
+    "priority": "medium",
+    "dueDate": "2024-01-18",
+    "completed": true,
+    "createdAt": "2024-01-14T14:30:00Z",
+    "updatedAt": "2024-01-17T16:45:00Z"
+  },
+  {
+    "id": "3",
+    "title": "Grocery shopping",
+    "description": "Buy groceries for the week including fresh vegetables and proteins",
+    "categoryId": "personal",
+    "priority": "medium",
+    "dueDate": "2024-01-19",
+    "completed": false,
+    "createdAt": "2024-01-16T08:15:00Z",
+    "updatedAt": "1/16/2024 8:15:00 AMZ"
+  },
+  {
+    "id": "4",
+    "title": "Call mom",
+    "description": "Weekly catch-up call with mom to discuss family updates",
+    "categoryId": "personal",
+    "priority": "low",
+    "dueDate": null,
+    "completed": false,
+    "createdAt": "1/16/2024 12:00:00 PMZ",
+    "updatedAt": "2024-01-16T12:00:00Z"
+  },
+  {
+    "id": "5",
+    "title": "Morning workout",
+    "description": "30-minute cardio session and strength training",
+    "categoryId": "health",
+    "priority": "high",
+    "dueDate": "2024-01-17",
+    "completed": true,
+    "createdAt": "2024-01-16T21:00:00Z",
+    "updatedAt": "2024-01-17T07:30:00Z"
+  },
+  {
+    "id": "6",
+    "title": "Book dentist appointment",
+    "description": "Schedule routine dental cleaning and checkup",
+    "categoryId": "health",
+    "priority": "medium",
+    "dueDate": "2024-01-25",
+    "completed": false,
+    "createdAt": "2024-01-15T16:20:00Z",
+    "updatedAt": "2024-01-15T16:20:00Z"
+  },
+  {
+    "id": "7",
+    "title": "Learn React hooks",
+    "description": "Complete the advanced React hooks tutorial series",
+    "categoryId": "learning",
+    "priority": "medium",
+    "dueDate": "2024-01-30",
+    "completed": false,
+    "createdAt": "2024-01-13T19:45:00Z",
+    "updatedAt": "2024-01-13T19:45:00Z"
+  },
+  {
+    "id": "8",
+    "title": "Read 'Atomic Habits'",
+    "description": "Finish reading the productivity book and take notes",
+    "categoryId": "learning",
+    "priority": "low",
+    "dueDate": null,
+    "completed": false,
+    "createdAt": "2024-01-12T11:30:00Z",
+    "updatedAt": "2024-01-12T11:30:00Z"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "all",
+    "name": "All Tasks",
+    "color": "#6366F1",
+    "icon": "List",
+    "taskCount": 8
+  },
+  {
+    "id": "work",
+    "name": "Work",
+    "color": "#3B82F6",
+    "icon": "Briefcase",
+    "taskCount": 2
+  },
+  {
+    "id": "personal",
+    "name": "Personal",
+    "color": "#10B981",
+    "icon": "User",
+    "taskCount": 2
+  },
+  {
+    "id": "health",
+    "name": "Health",
+    "color": "#F59E0B",
+    "icon": "Heart",
+    "taskCount": 2
+  },
+  {
+    "id": "learning",
+    "name": "Learning",
+    "color": "#8B5CF6",
+    "icon": "BookOpen",
+    "taskCount": 2
+  }
+]

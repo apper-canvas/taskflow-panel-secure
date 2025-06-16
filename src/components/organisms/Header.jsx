@@ -18,11 +18,11 @@ const Header = ({ onSearch, onTaskAdded }) => {
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center space-x-3"
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+<div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
               <ApperIcon name="CheckSquare" size={18} className="text-white" />
             </div>
             <h1 className="text-xl font-bold font-display text-white">
-              TaskFlow
+              Tasker
             </h1>
           </motion.div>
 

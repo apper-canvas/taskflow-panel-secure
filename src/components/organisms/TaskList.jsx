@@ -46,10 +46,10 @@ const TaskList = ({
   }
 
   const handleSelectAll = () => {
-    if (selectedTasks.size === filteredTasks.length) {
+if (selectedTasks.size === filteredTasks.length) {
       setSelectedTasks(new Set())
     } else {
-      setSelectedTasks(new Set(filteredTasks.map(t => t.id)))
+      setSelectedTasks(new Set(filteredTasks.map(t => t.Id)))
     }
   }
 
@@ -168,9 +168,9 @@ const TaskList = ({
       ) : (
         <div className="space-y-3">
           <AnimatePresence>
-            {filteredTasks.map((task, index) => (
+{filteredTasks.map((task, index) => (
               <motion.div
-                key={task.id}
+                key={task.Id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -181,8 +181,8 @@ const TaskList = ({
                   task={task}
                   onUpdate={onTaskUpdate}
                   onDelete={onTaskDelete}
-                  onEdit={onTaskEdit}
-                  isSelected={selectedTasks.has(task.id)}
+onEdit={onTaskEdit}
+                  isSelected={selectedTasks.has(task.Id)}
                   onSelect={handleSelectTask}
                 />
               </motion.div>

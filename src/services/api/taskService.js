@@ -1,137 +1,485 @@
-import tasksData from '../mockData/tasks.json';
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+import { toast } from 'react-toastify'
 
 class TaskService {
   constructor() {
-    this.tasks = [...tasksData];
+    this.apperClient = null
+    this.initializeClient()
+  }
+
+  initializeClient() {
+    const { ApperClient } = window.ApperSDK
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    })
   }
 
   async getAll() {
-    await delay(300);
-    return [...this.tasks];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Id" } },
+          { field: { Name: "Name" } },
+          { field: { Name: "title" } },
+          { field: { Name: "description" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "due_date" } },
+          { field: { Name: "completed" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { 
+            field: { Name: "category_id" },
+            referenceField: { field: { Name: "Name" } }
+          }
+        ],
+        orderBy: [
+          { fieldName: "created_at", sorttype: "DESC" }
+        ]
+      }
+
+      const response = await this.apperClient.fetchRecords('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        return []
+      }
+
+      return response.data || []
+    } catch (error) {
+      console.error("Error fetching tasks:", error)
+      toast.error("Failed to load tasks")
+      return []
+    }
   }
 
   async getById(id) {
-    await delay(200);
-    const task = this.tasks.find(t => t.id === id);
-    return task ? { ...task } : null;
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Id" } },
+          { field: { Name: "Name" } },
+          { field: { Name: "title" } },
+          { field: { Name: "description" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "due_date" } },
+          { field: { Name: "completed" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { 
+            field: { Name: "category_id" },
+            referenceField: { field: { Name: "Name" } }
+          }
+        ]
+      }
+
+      const response = await this.apperClient.getRecordById('task', parseInt(id), params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        return null
+      }
+
+      return response.data
+    } catch (error) {
+      console.error(`Error fetching task with ID ${id}:`, error)
+      return null
+    }
   }
 
   async getByCategory(categoryId) {
-    await delay(300);
-    return this.tasks.filter(t => t.categoryId === categoryId).map(t => ({ ...t }));
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Id" } },
+          { field: { Name: "Name" } },
+          { field: { Name: "title" } },
+          { field: { Name: "description" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "due_date" } },
+          { field: { Name: "completed" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { 
+            field: { Name: "category_id" },
+            referenceField: { field: { Name: "Name" } }
+          }
+        ],
+        where: [
+          {
+            FieldName: "category_id",
+            Operator: "EqualTo",
+            Values: [categoryId]
+          }
+        ],
+        orderBy: [
+          { fieldName: "created_at", sorttype: "DESC" }
+        ]
+      }
+
+      const response = await this.apperClient.fetchRecords('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        return []
+      }
+
+      return response.data || []
+    } catch (error) {
+      console.error("Error fetching tasks by category:", error)
+      toast.error("Failed to load tasks")
+      return []
+    }
   }
 
   async create(taskData) {
-    await delay(400);
-    const newTask = {
-      id: Date.now().toString(),
-      title: taskData.title || 'New Task',
-      description: taskData.description || '',
-      categoryId: taskData.categoryId || 'personal',
-      priority: taskData.priority || 'medium',
-      dueDate: taskData.dueDate || null,
-      completed: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    this.tasks.push(newTask);
-    return { ...newTask };
+    try {
+      const params = {
+        records: [
+          {
+            Name: taskData.title || 'New Task',
+            title: taskData.title || 'New Task',
+            description: taskData.description || '',
+            priority: taskData.priority || 'medium',
+            due_date: taskData.dueDate || null,
+            completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            category_id: parseInt(taskData.categoryId) || null
+          }
+        ]
+      }
+
+      const response = await this.apperClient.createRecord('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        throw new Error(response.message)
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success)
+        const failedRecords = response.results.filter(result => !result.success)
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`)
+            })
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null
+      }
+    } catch (error) {
+      console.error("Error creating task:", error)
+      throw error
+    }
   }
 
   async update(id, updates) {
-    await delay(300);
-    const index = this.tasks.findIndex(t => t.id === id);
-    if (index === -1) throw new Error('Task not found');
-    
-    this.tasks[index] = {
-      ...this.tasks[index],
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
-    return { ...this.tasks[index] };
+    try {
+      const updateData = {
+        Id: parseInt(id)
+      }
+
+      // Only include updateable fields
+      if (updates.title !== undefined) updateData.title = updates.title
+      if (updates.description !== undefined) updateData.description = updates.description
+      if (updates.priority !== undefined) updateData.priority = updates.priority
+      if (updates.due_date !== undefined) updateData.due_date = updates.due_date
+      if (updates.dueDate !== undefined) updateData.due_date = updates.dueDate
+      if (updates.completed !== undefined) updateData.completed = updates.completed
+      if (updates.category_id !== undefined) updateData.category_id = parseInt(updates.category_id)
+      if (updates.categoryId !== undefined) updateData.category_id = parseInt(updates.categoryId)
+      
+      updateData.updated_at = new Date().toISOString()
+
+      const params = {
+        records: [updateData]
+      }
+
+      const response = await this.apperClient.updateRecord('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        throw new Error(response.message)
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success)
+        const failedUpdates = response.results.filter(result => !result.success)
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`)
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`)
+            })
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        return successfulUpdates.length > 0 ? successfulUpdates[0].data : null
+      }
+    } catch (error) {
+      console.error("Error updating task:", error)
+      throw error
+    }
   }
 
   async delete(id) {
-    await delay(250);
-    const index = this.tasks.findIndex(t => t.id === id);
-    if (index === -1) throw new Error('Task not found');
-    
-    const deletedTask = this.tasks.splice(index, 1)[0];
-    return { ...deletedTask };
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      }
+
+      const response = await this.apperClient.deleteRecord('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        throw new Error(response.message)
+      }
+
+      if (response.results) {
+        const failedDeletions = response.results.filter(result => !result.success)
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`)
+          
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        return response.results.some(result => result.success)
+      }
+    } catch (error) {
+      console.error("Error deleting task:", error)
+      throw error
+    }
   }
 
   async toggleComplete(id) {
-    await delay(200);
-    const task = this.tasks.find(t => t.id === id);
-    if (!task) throw new Error('Task not found');
-    
-    task.completed = !task.completed;
-    task.updatedAt = new Date().toISOString();
-    return { ...task };
+    try {
+      // First get current task state
+      const currentTask = await this.getById(id)
+      if (!currentTask) throw new Error('Task not found')
+      
+      // Update the completed status
+      return await this.update(id, { 
+        completed: !currentTask.completed 
+      })
+    } catch (error) {
+      console.error("Error toggling task completion:", error)
+      throw error
+    }
   }
 
   async bulkDelete(ids) {
-    await delay(400);
-    const deletedTasks = [];
-    ids.forEach(id => {
-      const index = this.tasks.findIndex(t => t.id === id);
-      if (index !== -1) {
-        deletedTasks.push(this.tasks.splice(index, 1)[0]);
+    try {
+      const recordIds = ids.map(id => parseInt(id))
+      const params = {
+        RecordIds: recordIds
       }
-    });
-    return deletedTasks;
+
+      const response = await this.apperClient.deleteRecord('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        throw new Error(response.message)
+      }
+
+      if (response.results) {
+        const failedDeletions = response.results.filter(result => !result.success)
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`)
+          
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        return response.results.filter(result => result.success)
+      }
+    } catch (error) {
+      console.error("Error bulk deleting tasks:", error)
+      throw error
+    }
   }
 
   async search(query) {
-    await delay(300);
-    const lowercaseQuery = query.toLowerCase();
-    return this.tasks.filter(task => 
-      task.title.toLowerCase().includes(lowercaseQuery) ||
-      task.description.toLowerCase().includes(lowercaseQuery)
-    ).map(t => ({ ...t }));
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Id" } },
+          { field: { Name: "Name" } },
+          { field: { Name: "title" } },
+          { field: { Name: "description" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "due_date" } },
+          { field: { Name: "completed" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { 
+            field: { Name: "category_id" },
+            referenceField: { field: { Name: "Name" } }
+          }
+        ],
+        whereGroups: [
+          {
+            operator: "OR",
+            subGroups: [
+              {
+                operator: "OR",
+                conditions: [
+                  {
+                    fieldName: "title",
+                    operator: "Contains",
+                    values: [query],
+                    include: true
+                  },
+                  {
+                    fieldName: "description",
+                    operator: "Contains",
+                    values: [query],
+                    include: true
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        orderBy: [
+          { fieldName: "created_at", sorttype: "DESC" }
+        ]
+      }
+
+      const response = await this.apperClient.fetchRecords('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        return []
+      }
+
+      return response.data || []
+    } catch (error) {
+      console.error("Error searching tasks:", error)
+      toast.error("Search failed")
+      return []
+    }
   }
 
   async getByFilters(filters) {
-    await delay(300);
-    let filteredTasks = [...this.tasks];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Id" } },
+          { field: { Name: "Name" } },
+          { field: { Name: "title" } },
+          { field: { Name: "description" } },
+          { field: { Name: "priority" } },
+          { field: { Name: "due_date" } },
+          { field: { Name: "completed" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "updated_at" } },
+          { 
+            field: { Name: "category_id" },
+            referenceField: { field: { Name: "Name" } }
+          }
+        ],
+        where: [],
+        orderBy: [
+          { fieldName: "created_at", sorttype: "DESC" }
+        ]
+      }
 
-    if (filters.categoryId && filters.categoryId !== 'all') {
-      filteredTasks = filteredTasks.filter(t => t.categoryId === filters.categoryId);
-    }
+      // Add category filter
+      if (filters.categoryId && filters.categoryId !== 'all') {
+        params.where.push({
+          FieldName: "category_id",
+          Operator: "EqualTo",
+          Values: [filters.categoryId]
+        })
+      }
 
-    if (filters.priority && filters.priority !== 'all') {
-      filteredTasks = filteredTasks.filter(t => t.priority === filters.priority);
-    }
+      // Add priority filter
+      if (filters.priority && filters.priority !== 'all') {
+        params.where.push({
+          FieldName: "priority",
+          Operator: "EqualTo",
+          Values: [filters.priority]
+        })
+      }
 
-    if (filters.completed !== undefined) {
-      filteredTasks = filteredTasks.filter(t => t.completed === filters.completed);
-    }
+      // Add completion status filter
+      if (filters.completed !== undefined) {
+        params.where.push({
+          FieldName: "completed",
+          Operator: "EqualTo",
+          Values: [filters.completed.toString()]
+        })
+      }
 
-    if (filters.dueDate) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      filteredTasks = filteredTasks.filter(t => {
-        if (!t.dueDate) return false;
-        const taskDate = new Date(t.dueDate);
-        taskDate.setHours(0, 0, 0, 0);
+      // Add due date filter
+      if (filters.dueDate) {
+        const today = new Date().toISOString().split('T')[0]
         
         switch (filters.dueDate) {
           case 'today':
-            return taskDate.getTime() === today.getTime();
+            params.where.push({
+              FieldName: "due_date",
+              Operator: "EqualTo",
+              Values: [today]
+            })
+            break
           case 'overdue':
-            return taskDate < today && !t.completed;
+            params.where.push({
+              FieldName: "due_date",
+              Operator: "LessThan",
+              Values: [today]
+            })
+            params.where.push({
+              FieldName: "completed",
+              Operator: "EqualTo",
+              Values: ["false"]
+            })
+            break
           case 'upcoming':
-            return taskDate > today;
-          default:
-            return true;
+            params.where.push({
+              FieldName: "due_date",
+              Operator: "GreaterThan",
+              Values: [today]
+            })
+            break
         }
-      });
-    }
+      }
 
-    return filteredTasks.map(t => ({ ...t }));
+      const response = await this.apperClient.fetchRecords('task', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        return []
+      }
+
+      return response.data || []
+    } catch (error) {
+      console.error("Error filtering tasks:", error)
+      toast.error("Failed to filter tasks")
+      return []
+    }
   }
 }
 

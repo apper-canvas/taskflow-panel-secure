@@ -66,13 +66,13 @@ const Sidebar = () => {
         <div>
           <h2 className="text-lg font-semibold text-white mb-4">Categories</h2>
           <div className="space-y-2">
-            {categories.map((category) => (
+{categories.map((category) => (
               <CategoryCard
-                key={category.id}
+                key={category.Id}
                 category={category}
                 isActive={
-                  (!categoryId && category.id === 'all') ||
-                  categoryId === category.id
+                  (!categoryId && category.Id === 'all') ||
+                  categoryId === category.Id
                 }
               />
             ))}

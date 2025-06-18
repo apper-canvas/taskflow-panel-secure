@@ -68,21 +68,20 @@ const Dashboard = () => {
     }
   }
 
-  const handleTaskUpdate = (updatedTask) => {
+const handleTaskUpdate = (updatedTask) => {
     setTasks(prev => prev.map(task => 
-      task.id === updatedTask.id ? updatedTask : task
+      task.Id === updatedTask.Id ? updatedTask : task
     ))
   }
 
   const handleTaskDelete = (taskId) => {
-    setTasks(prev => prev.filter(task => task.id !== taskId))
+    setTasks(prev => prev.filter(task => task.Id !== taskId))
   }
 
   const handleTaskAdded = (newTask) => {
     setTasks(prev => [newTask, ...prev])
     loadTasks() // Refresh to ensure consistency
   }
-
   const handleBulkDelete = async (taskIds) => {
     try {
       await taskService.bulkDelete(taskIds)

@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { toast } from 'react-toastify'
-import Button from '@/components/atoms/Button'
-import Input from '@/components/atoms/Input'
-import ApperIcon from '@/components/ApperIcon'
-import { taskService, categoryService } from '@/services'
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-toastify";
+import Button from "@/components/atoms/Button";
+import Input from "@/components/atoms/Input";
+import ApperIcon from "@/components/ApperIcon";
+import { categoryService, taskService } from "@/services";
 
 const QuickAddModal = ({ isOpen, onClose, onTaskAdded }) => {
   const [formData, setFormData] = useState({
@@ -17,16 +17,16 @@ const QuickAddModal = ({ isOpen, onClose, onTaskAdded }) => {
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState([])
 
-  useState(() => {
+useEffect(() => {
     if (isOpen) {
       loadCategories()
     }
   }, [isOpen])
 
   const loadCategories = async () => {
-    try {
+try {
       const data = await categoryService.getAll()
-      setCategories(data.filter(c => c.id !== 'all'))
+      setCategories(data.filter(c => c.Id !== 'all'))
     } catch (error) {
       console.error('Failed to load categories:', error)
     }
@@ -140,9 +140,9 @@ const QuickAddModal = ({ isOpen, onClose, onTaskAdded }) => {
                       onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
                       className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200"
                     >
-                      {categories.map(category => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
+{categories.map(category => (
+                        <option key={category.Id} value={category.Id}>
+                          {category.Name}
                         </option>
                       ))}
                     </select>
